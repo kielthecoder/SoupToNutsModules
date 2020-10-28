@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoupToNuts", "SoupToNuts\SoupToNuts.csproj", "{DCD6BF39-C468-4A29-AEC1-D6D6CD5E2CEC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCD6BF39-C468-4A29-AEC1-D6D6CD5E2CEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCD6BF39-C468-4A29-AEC1-D6D6CD5E2CEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCD6BF39-C468-4A29-AEC1-D6D6CD5E2CEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCD6BF39-C468-4A29-AEC1-D6D6CD5E2CEC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
