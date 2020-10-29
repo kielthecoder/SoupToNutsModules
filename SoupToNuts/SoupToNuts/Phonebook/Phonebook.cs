@@ -7,8 +7,12 @@ namespace SoupToNuts.Phonebook
 {
     public class Phonebook
     {
+        public delegate void StatusFeedback (bool success);
+
         private List<PhonebookEntry> _entries;
         private string _filename;
+
+        public StatusFeedback OnInitialize { get; set; }
 
         public Phonebook()
         {
@@ -38,12 +42,16 @@ namespace SoupToNuts.Phonebook
                             });
                         }
                     }
+
+                    if (OnInitialize != null) OnInitialize(true);
                 }
             }
             catch (Exception e)
             {
                 ErrorLog.Error("Exception in Phonebook.Initialize: {0}",
                     e.Message);
+
+                if (OnInitialize != null) OnInitialize(false);
             }
         }
     }
