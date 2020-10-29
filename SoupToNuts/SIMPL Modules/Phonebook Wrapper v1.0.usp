@@ -1,0 +1,21 @@
+// --- Compiler Directives ---
+
+// #CATEGORY "" 
+// #DIGITAL_EXPAND 
+// #ANALOG_SERIAL_EXPAND 
+
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+#ENABLE_TRACE
+
+// #DEFINE_CONSTANT
+
+#USER_SIMPLSHARP_LIBRARY "SoupToNuts"
+
+// --- Main ---
+
+Function Main()
+{
+	WaitForInitializationComplete();
+}
+

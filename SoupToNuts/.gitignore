@@ -1,5 +1,6 @@
 bin/
 obj/
+SPlsWork/
 *.csproj.user
 *.projectinfo
 *.suo
