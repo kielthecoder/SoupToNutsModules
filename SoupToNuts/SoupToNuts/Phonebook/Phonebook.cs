@@ -21,21 +21,29 @@ namespace SoupToNuts.Phonebook
             
             _entries.Clear();
 
-            using (var stream = File.OpenText(_filename))
+            try
             {
-                while (!stream.EndOfStream)
+                using (var stream = File.OpenText(_filename))
                 {
-                    var text = stream.ReadLine();
-
-                    if (text.IndexOf('|') > 0)
+                    while (!stream.EndOfStream)
                     {
-                        var fields = text.Split('|');
-                        _entries.Add(new PhonebookEntry {
-                            Name = fields[0],
-                            Number = fields[1]
-                        });
+                        var text = stream.ReadLine();
+
+                        if (text.IndexOf('|') > 0)
+                        {
+                            var fields = text.Split('|');
+                            _entries.Add(new PhonebookEntry {
+                                Name = fields[0],
+                                Number = fields[1]
+                            });
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                ErrorLog.Error("Exception in Phonebook.Initialize: {0}",
+                    e.Message);
             }
         }
     }
