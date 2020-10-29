@@ -12,6 +12,10 @@
 
 #USER_SIMPLSHARP_LIBRARY "SoupToNuts"
 
+// --- Outputs ---
+
+DIGITAL_OUTPUT Initialized_Fb;
+
 // --- Module Parameters ---
 
 STRING_PARAMETER File_Name[200];
@@ -20,10 +24,18 @@ STRING_PARAMETER File_Name[200];
 
 Phonebook Contacts;
 
+// --- Callbacks ---
+
+CALLBACK FUNCTION Contacts_OnInitialize (INTEGER success)
+{
+	Initialized_Fb = success;
+}
+
 // --- Main ---
 
 Function Main()
 {
+	RegisterDelegate(Contacts, OnInitialize, Contacts_OnInitialize);
 	WaitForInitializationComplete();
 	Contacts.Initialize(File_Name);
 }
