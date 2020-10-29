@@ -7,7 +7,7 @@ namespace SoupToNuts.Phonebook
 {
     public class Phonebook
     {
-        public delegate void StatusFeedback (bool success);
+        public delegate void StatusFeedback (ushort success);
 
         private List<PhonebookEntry> _entries;
         private string _filename;
@@ -43,7 +43,7 @@ namespace SoupToNuts.Phonebook
                         }
                     }
 
-                    if (OnInitialize != null) OnInitialize(true);
+                    if (OnInitialize != null) OnInitialize(1);
                 }
             }
             catch (Exception e)
@@ -51,7 +51,7 @@ namespace SoupToNuts.Phonebook
                 ErrorLog.Error("Exception in Phonebook.Initialize: {0}",
                     e.Message);
 
-                if (OnInitialize != null) OnInitialize(false);
+                if (OnInitialize != null) OnInitialize(0);
             }
         }
     }
