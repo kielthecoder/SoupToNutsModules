@@ -1,5 +1,13 @@
 bin/
 obj/
+SPlsWork/
+*.ASV
 *.csproj.user
+*.lpz
+*.lpz.hash
 *.projectinfo
+*.sig
+*.sm2
+*.smft
 *.suo
+*.zip
