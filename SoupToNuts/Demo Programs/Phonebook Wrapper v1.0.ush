@@ -21,7 +21,9 @@
   SmplCName=Phonebook Wrapper v1.0.usp
   Code=1
   SysRev5=4.000
-  SMWRev=2.02.05
+  SMWRev=3.00.00
+  OutputCue1=Initialized_Fb
+  OutputSigType1=Digital
   ParamCue1=[Reference Name]
   ParamCue2=File_Name
   ParamSigType2=String
@@ -29,8 +31,8 @@
   MaxVariableInputs=0
   MinVariableInputsList2=0
   MaxVariableInputsList2=0
-  MinVariableOutputs=0
-  MaxVariableOutputs=0
+  MinVariableOutputs=1
+  MaxVariableOutputs=1
   MinVariableOutputsList2=0
   MaxVariableOutputsList2=0
   MinVariableParams=1
