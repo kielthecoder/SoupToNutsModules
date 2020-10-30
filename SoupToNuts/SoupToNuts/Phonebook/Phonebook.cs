@@ -13,6 +13,7 @@ namespace SoupToNuts.Phonebook
         private string _filename;
 
         public StatusFeedback OnInitialize { get; set; }
+        public StatusFeedback OnSave { get; set; }
 
         public Phonebook()
         {
@@ -42,9 +43,9 @@ namespace SoupToNuts.Phonebook
                             });
                         }
                     }
-
-                    if (OnInitialize != null) OnInitialize(1);
                 }
+
+                if (OnInitialize != null) OnInitialize(1);
             }
             catch (Exception e)
             {
@@ -52,6 +53,29 @@ namespace SoupToNuts.Phonebook
                     e.Message);
 
                 if (OnInitialize != null) OnInitialize(0);
+            }
+        }
+
+        public void Save()
+        {
+            try
+            {
+                using (var stream = File.CreateText(_filename))
+                {
+                    foreach (var entry in _entries)
+                    {
+                        stream.WriteLine("{0}|{1}", entry.Name, entry.Number);
+                    }
+                }
+
+                if (OnSave != null) OnSave(1);
+            }
+            catch (Exception e)
+            {
+                ErrorLog.Error("Exception in Phonebook.Save: {0}",
+                    e.Message);
+
+                if (OnSave != null) OnSave(0);
             }
         }
     }
