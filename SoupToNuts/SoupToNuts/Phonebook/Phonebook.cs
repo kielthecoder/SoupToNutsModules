@@ -5,6 +5,13 @@ using Crestron.SimplSharp.CrestronIO;
 
 namespace SoupToNuts.Phonebook
 {
+    public class PhonebookUpdateEventArgs : EventArgs
+    {
+        public ushort Index { get; set; }
+        public string Name { get; set; }
+        public string Number { get; set; }
+    }
+
     public class Phonebook
     {
         public delegate void StatusFeedback (ushort success);
@@ -14,6 +21,42 @@ namespace SoupToNuts.Phonebook
 
         public StatusFeedback OnInitialize { get; set; }
         public StatusFeedback OnSave { get; set; }
+
+        public event EventHandler PhonebookUpdated;
+
+        private int _selection;
+
+        public ushort Selection
+        {
+            get
+            {
+                if (_selection < 0)
+                    return 0;
+                else
+                    return (ushort)(_selection + 1);
+            }
+            set
+            {
+                if (value < _entries.Count)
+                {
+                    _selection = value - 1;
+
+                    if (_selection < 0)
+                    {
+                        SelectedEntryName = "";
+                        SelectedEntryNumber = "";
+                    }
+                    else
+                    {
+                        SelectedEntryName = _entries[_selection].Name;
+                        SelectedEntryNumber = _entries[_selection].Number;
+                    }
+                }
+            }
+        }
+
+        public string SelectedEntryName { get; private set; }
+        public string SelectedEntryNumber { get; private set; }
 
         public Phonebook()
         {
@@ -77,6 +120,20 @@ namespace SoupToNuts.Phonebook
 
                 if (OnSave != null) OnSave(0);
             }
+        }
+
+        public void Add(string name, string number)
+        {
+            _entries.Add(new PhonebookEntry { Name = name, Number = number });
+
+            if (PhonebookUpdated != null) PhonebookUpdated(this, new PhonebookUpdateEventArgs { Index = (ushort)_entries.Count, Name = name, Number = number });
+        }
+
+        public void Remove(ushort index)
+        {
+            _entries.RemoveAt(index);
+
+            if (PhonebookUpdated != null) PhonebookUpdated(this, new PhonebookUpdateEventArgs { Index = index, Name = "", Number = "" });
         }
     }
 }
