@@ -131,14 +131,30 @@ namespace SoupToNuts.Phonebook
         {
             _entries.Add(new PhonebookEntry { Name = name, Number = number });
 
-            if (PhonebookUpdated != null) PhonebookUpdated(this, new PhonebookUpdateEventArgs { Index = (ushort)_entries.Count, Name = name, Number = number });
+            if (PhonebookUpdated != null)
+            {
+                PhonebookUpdated(this, new PhonebookUpdateEventArgs {
+                    Index = (ushort)_entries.Count,
+                    Name = name,
+                    Number = number });
+            }
         }
 
         public void Remove(ushort index)
         {
-            _entries.RemoveAt(index);
+            if ((index > 0) &&
+                (index < _entries.Count))
+            {
+                _entries.RemoveAt(index - 1);
 
-            if (PhonebookUpdated != null) PhonebookUpdated(this, new PhonebookUpdateEventArgs { Index = index, Name = "", Number = "" });
+                if (PhonebookUpdated != null)
+                {
+                    PhonebookUpdated(this, new PhonebookUpdateEventArgs {
+                        Index = index,
+                        Name = "",
+                        Number = "" });            
+                }
+            }
         }
     }
 }
