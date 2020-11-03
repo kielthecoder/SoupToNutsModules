@@ -15,14 +15,17 @@ namespace SoupToNuts.Phonebook
     public class Phonebook
     {
         public delegate void StatusFeedback (ushort success);
+        public delegate void SelectionFeedback (ushort value);
+        public delegate void PhonebookUpdateEventHandler (object sender, PhonebookUpdateEventArgs args);
 
         private List<PhonebookEntry> _entries;
         private string _filename;
 
         public StatusFeedback OnInitialize { get; set; }
         public StatusFeedback OnSave { get; set; }
+        public SelectionFeedback OnSelection { get; set; }
 
-        public event EventHandler PhonebookUpdated;
+        public event PhonebookUpdateEventHandler PhonebookUpdated;
 
         private int _selection;
 
@@ -51,6 +54,8 @@ namespace SoupToNuts.Phonebook
                         SelectedEntryName = _entries[_selection].Name;
                         SelectedEntryNumber = _entries[_selection].Number;
                     }
+
+                    if (OnSelection != null) OnSelection((ushort)(_selection + 1));
                 }
             }
         }

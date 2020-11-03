@@ -42,6 +42,11 @@ Phonebook Contacts;
 
 // --- Events ---
 
+THREADSAFE PUSH Save
+{
+	Contacts.Save();
+}
+
 THREADSAFE PUSH Add_New_Contact
 {
 	Contacts.Add(New_Contact_Name, New_Contact_Number);
@@ -70,6 +75,11 @@ CALLBACK FUNCTION Contacts_OnSave (INTEGER success)
 	Save_Fb = success;
 }
 
+CALLBACK FUNCTION Contacts_OnSelection (INTEGER value)
+{
+	Select_Fb = value;
+}
+
 EVENTHANDLER Contacts_Updated (Phonebook sender, PhonebookUpdateEventArgs args)
 {
 	Trace("Contact %d updated: %s [ %s ]", args.Index, args.Name, args.Number);
@@ -81,6 +91,7 @@ Function Main()
 {
 	RegisterDelegate(Contacts, OnInitialize, Contacts_OnInitialize);
 	RegisterDelegate(Contacts, OnSave, Contacts_OnSave);
+	RegisterDelegate(Contacts, OnSelection, Contacts_OnSelection);
 
 	RegisterEvent(Contacts, PhonebookUpdated, Contacts_Updated);
 

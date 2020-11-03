@@ -12,9 +12,25 @@
 
 #USER_SIMPLSHARP_LIBRARY "SoupToNuts"
 
+// --- Inputs ---
+
+DIGITAL_INPUT Save;
+
+STRING_INPUT  New_Contact_Name[100];
+STRING_INPUT  New_Contact_Number[100];
+DIGITAL_INPUT Add_New_Contact;
+
+ANALOG_INPUT  Select;
+DIGITAL_INPUT Remove_Selected;
+
 // --- Outputs ---
 
 DIGITAL_OUTPUT Initialized_Fb;
+DIGITAL_OUTPUT Save_Fb;
+
+ANALOG_OUTPUT Select_Fb;
+STRING_OUTPUT Selected_Entry_Name;
+STRING_OUTPUT Selected_Entry_Number;
 
 // --- Module Parameters ---
 
@@ -24,6 +40,29 @@ STRING_PARAMETER File_Name[200];
 
 Phonebook Contacts;
 
+// --- Events ---
+
+THREADSAFE PUSH Save
+{
+	Contacts.Save();
+}
+
+THREADSAFE PUSH Add_New_Contact
+{
+	Contacts.Add(New_Contact_Name, New_Contact_Number);
+}
+
+THREADSAFE CHANGE Select
+{
+	Contacts.Selection = Select;
+}
+
+THREADSAFE PUSH Remove_Selected
+{
+	If (Contacts.Selection > 0)
+		Contacts.Remove(Contacts.Selection);
+}
+
 // --- Callbacks ---
 
 CALLBACK FUNCTION Contacts_OnInitialize (INTEGER success)
@@ -31,11 +70,31 @@ CALLBACK FUNCTION Contacts_OnInitialize (INTEGER success)
 	Initialized_Fb = success;
 }
 
+CALLBACK FUNCTION Contacts_OnSave (INTEGER success)
+{
+	Save_Fb = success;
+}
+
+CALLBACK FUNCTION Contacts_OnSelection (INTEGER value)
+{
+	Select_Fb = value;
+}
+
+EVENTHANDLER Contacts_Updated (Phonebook sender, PhonebookUpdateEventArgs args)
+{
+	Trace("Contact %d updated: %s [ %s ]", args.Index, args.Name, args.Number);
+}
+
 // --- Main ---
 
 Function Main()
 {
 	RegisterDelegate(Contacts, OnInitialize, Contacts_OnInitialize);
+	RegisterDelegate(Contacts, OnSave, Contacts_OnSave);
+	RegisterDelegate(Contacts, OnSelection, Contacts_OnSelection);
+
+	RegisterEvent(Contacts, PhonebookUpdated, Contacts_Updated);
+
 	WaitForInitializationComplete();
 	Contacts.Initialize(File_Name);
 }
