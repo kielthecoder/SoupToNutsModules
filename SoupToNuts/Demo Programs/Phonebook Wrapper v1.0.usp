@@ -78,6 +78,8 @@ CALLBACK FUNCTION Contacts_OnSave (INTEGER success)
 CALLBACK FUNCTION Contacts_OnSelection (INTEGER value)
 {
 	Select_Fb = value;
+	Selected_Entry_Name = Contacts.SelectedEntryName;
+	Selected_Entry_Number = Contacts.SelectedEntryNumber;
 }
 
 EVENTHANDLER Contacts_Updated (Phonebook sender, PhonebookUpdateEventArgs args)
