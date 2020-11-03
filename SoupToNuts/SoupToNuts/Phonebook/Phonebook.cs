@@ -5,14 +5,63 @@ using Crestron.SimplSharp.CrestronIO;
 
 namespace SoupToNuts.Phonebook
 {
+    public class PhonebookUpdateEventArgs : EventArgs
+    {
+        public ushort Index { get; set; }
+        public string Name { get; set; }
+        public string Number { get; set; }
+    }
+
     public class Phonebook
     {
         public delegate void StatusFeedback (ushort success);
+        public delegate void SelectionFeedback (ushort value);
+        public delegate void PhonebookUpdateEventHandler (object sender, PhonebookUpdateEventArgs args);
 
         private List<PhonebookEntry> _entries;
         private string _filename;
 
         public StatusFeedback OnInitialize { get; set; }
+        public StatusFeedback OnSave { get; set; }
+        public SelectionFeedback OnSelection { get; set; }
+
+        public event PhonebookUpdateEventHandler PhonebookUpdated;
+
+        private int _selection;
+
+        public ushort Selection
+        {
+            get
+            {
+                if (_selection < 0)
+                    return 0;
+                else
+                    return (ushort)(_selection + 1);
+            }
+            set
+            {
+                if (value < _entries.Count)
+                {
+                    _selection = value - 1;
+
+                    if (_selection < 0)
+                    {
+                        SelectedEntryName = "";
+                        SelectedEntryNumber = "";
+                    }
+                    else
+                    {
+                        SelectedEntryName = _entries[_selection].Name;
+                        SelectedEntryNumber = _entries[_selection].Number;
+                    }
+
+                    if (OnSelection != null) OnSelection((ushort)(_selection + 1));
+                }
+            }
+        }
+
+        public string SelectedEntryName { get; private set; }
+        public string SelectedEntryNumber { get; private set; }
 
         public Phonebook()
         {
@@ -42,9 +91,9 @@ namespace SoupToNuts.Phonebook
                             });
                         }
                     }
-
-                    if (OnInitialize != null) OnInitialize(1);
                 }
+
+                if (OnInitialize != null) OnInitialize(1);
             }
             catch (Exception e)
             {
@@ -52,6 +101,59 @@ namespace SoupToNuts.Phonebook
                     e.Message);
 
                 if (OnInitialize != null) OnInitialize(0);
+            }
+        }
+
+        public void Save()
+        {
+            try
+            {
+                using (var stream = File.CreateText(_filename))
+                {
+                    foreach (var entry in _entries)
+                    {
+                        stream.WriteLine("{0}|{1}", entry.Name, entry.Number);
+                    }
+                }
+
+                if (OnSave != null) OnSave(1);
+            }
+            catch (Exception e)
+            {
+                ErrorLog.Error("Exception in Phonebook.Save: {0}",
+                    e.Message);
+
+                if (OnSave != null) OnSave(0);
+            }
+        }
+
+        public void Add(string name, string number)
+        {
+            _entries.Add(new PhonebookEntry { Name = name, Number = number });
+
+            if (PhonebookUpdated != null)
+            {
+                PhonebookUpdated(this, new PhonebookUpdateEventArgs {
+                    Index = (ushort)_entries.Count,
+                    Name = name,
+                    Number = number });
+            }
+        }
+
+        public void Remove(ushort index)
+        {
+            if ((index > 0) &&
+                (index < _entries.Count))
+            {
+                _entries.RemoveAt(index - 1);
+
+                if (PhonebookUpdated != null)
+                {
+                    PhonebookUpdated(this, new PhonebookUpdateEventArgs {
+                        Index = index,
+                        Name = "",
+                        Number = "" });            
+                }
             }
         }
     }
