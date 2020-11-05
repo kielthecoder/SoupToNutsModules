@@ -27,6 +27,25 @@ namespace SoupToNuts.Phonebook
 
         public event PhonebookUpdateEventHandler PhonebookUpdated;
 
+        private const ushort MAX_PAGE_SIZE = 500;
+        private ushort _pageSize;
+
+        public ushort PageSize
+        {
+            get
+            {
+                return _pageSize;
+            }
+            set
+            {
+                if ((value > 0) &&
+                    (value <= MAX_PAGE_SIZE))
+                {
+                    _pageSize = value;
+                }
+            }
+        }
+
         private int _selection;
 
         public ushort Selection
