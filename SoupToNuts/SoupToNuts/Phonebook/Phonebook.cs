@@ -57,6 +57,8 @@ namespace SoupToNuts.Phonebook
                 if (_entries.Count % PageSize > 0)
                     pages++;
 
+                if (pages == 0) pages = 1;
+
                 return pages;
             }
         }
