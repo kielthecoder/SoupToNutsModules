@@ -77,6 +77,7 @@ namespace SoupToNuts.Phonebook
                     (value <= TotalPages))
                 {
                     _currentPage = value;
+                    Selection = 0;
                 }
             }
         }
