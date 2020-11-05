@@ -114,6 +114,25 @@ namespace SoupToNuts.Phonebook
             }
         }
 
+        public ushort SelectPageEntry
+        {
+            get
+            {
+                if (_selection < 0)
+                    return 0;
+
+                return (ushort)((_selection + 1) % PageSize);
+            }
+            set
+            {
+                if ((value > 0) &&
+                    (value <= PageSize))
+                {
+                    Selection = (ushort)((CurrentPage - 1) * PageSize + value);
+                }
+            }
+        }
+
         public string SelectedEntryName { get; private set; }
         public string SelectedEntryNumber { get; private set; }
 
