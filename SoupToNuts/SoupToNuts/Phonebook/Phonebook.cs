@@ -46,6 +46,39 @@ namespace SoupToNuts.Phonebook
             }
         }
 
+        public ushort TotalPages
+        {
+            get
+            {
+                ushort pages;
+
+                pages = (ushort)(_entries.Count / PageSize);
+
+                if (_entries.Count % PageSize > 0)
+                    pages++;
+
+                return pages;
+            }
+        }
+
+        private ushort _currentPage;
+
+        public ushort CurrentPage
+        {
+            get
+            {
+                return _currentPage;
+            }
+            set
+            {
+                if ((value > 0) &&
+                    (value <= TotalPages))
+                {
+                    _currentPage = value;
+                }
+            }
+        }
+
         private int _selection;
 
         public ushort Selection
