@@ -40,7 +40,7 @@ namespace SoupToNuts.Phonebook
             }
             set
             {
-                if (value < _entries.Count)
+                if (value <= _entries.Count)
                 {
                     _selection = value - 1;
 
@@ -143,7 +143,7 @@ namespace SoupToNuts.Phonebook
         public void Remove(ushort index)
         {
             if ((index > 0) &&
-                (index < _entries.Count))
+                (index <= _entries.Count))
             {
                 _entries.RemoveAt(index - 1);
 
