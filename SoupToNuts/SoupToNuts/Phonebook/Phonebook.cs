@@ -12,6 +12,40 @@ namespace SoupToNuts.Phonebook
         public string Number { get; set; }
     }
 
+    public class PhonebookPageEventArgs : EventArgs
+    {
+        private string[] _names;
+
+        public ushort CurrentPage { get; private set; }
+
+        public PhonebookPageEventArgs (List<PhonebookEntry> entries, int currentPage, int pageSize)
+        {
+            CurrentPage = (ushort)currentPage;
+
+            _names = new string[pageSize];
+
+            for (int i = 0; i < pageSize; i++)
+            {
+                int j = (currentPage - 1) * pageSize + i;
+
+                if (j < entries.Count)
+                    _names[i] = entries[j].Name;
+                else
+                    _names[i] = "";
+            }
+        }
+
+        public string EntryName (ushort index)
+        {
+            if (index <= _names.Length)
+            {
+                return _names[index - 1];
+            }
+
+            return "";
+        }
+    }
+
     public class Phonebook
     {
         public delegate void StatusFeedback (ushort success);
