@@ -8,7 +8,7 @@
 #ENABLE_STACK_CHECKING
 #ENABLE_TRACE
 
-// #DEFINE_CONSTANT
+#DEFINE_CONSTANT MAX_PAGE_SIZE 10
 
 #USER_SIMPLSHARP_LIBRARY "SoupToNuts"
 
@@ -23,6 +23,8 @@ DIGITAL_INPUT Add_New_Contact;
 ANALOG_INPUT  Select;
 DIGITAL_INPUT Remove_Selected;
 
+ANALOG_INPUT  Current_Page;
+
 // --- Outputs ---
 
 DIGITAL_OUTPUT Initialized_Fb;
@@ -31,6 +33,11 @@ DIGITAL_OUTPUT Save_Fb;
 ANALOG_OUTPUT Select_Fb;
 STRING_OUTPUT Selected_Entry_Name;
 STRING_OUTPUT Selected_Entry_Number;
+
+ANALOG_OUTPUT Current_Page_Fb;
+ANALOG_OUTPUT Total_Pages_Fb;
+
+STRING_OUTPUT Page_Entry_Name[MAX_PAGE_SIZE];
 
 // --- Module Parameters ---
 
@@ -63,10 +70,19 @@ THREADSAFE PUSH Remove_Selected
 		Contacts.Remove(Contacts.Selection);
 }
 
+THREADSAFE CHANGE Current_Page
+{
+	Contacts.CurrentPage = Current_Page;
+}
+
 // --- Callbacks ---
 
 CALLBACK FUNCTION Contacts_OnInitialize (INTEGER success)
 {
+	Contacts.PageSize = MAX_PAGE_SIZE;
+	Contacts.CurrentPage = 1;
+
+	Total_Pages_Fb = Contacts.TotalPages;
 	Initialized_Fb = success;
 }
 
@@ -85,6 +101,20 @@ CALLBACK FUNCTION Contacts_OnSelection (INTEGER value)
 EVENTHANDLER Contacts_Updated (Phonebook sender, PhonebookUpdateEventArgs args)
 {
 	Trace("Contact %d updated: %s [ %s ]", args.Index, args.Name, args.Number);
+
+	Total_Pages_Fb = Contacts.TotalPages;
+}
+
+EVENTHANDLER Contacts_Page_Updated (Phonebook sender, PhonebookPageEventArgs args)
+{
+	INTEGER i;
+
+	Current_Page_Fb = args.Page;
+
+	For (i = 1 To sender.PageSize)
+	{
+		Page_Entry_Name[i] = args.Names[i - 1];
+	}
 }
 
 // --- Main ---
@@ -96,6 +126,7 @@ Function Main()
 	RegisterDelegate(Contacts, OnSelection, Contacts_OnSelection);
 
 	RegisterEvent(Contacts, PhonebookUpdated, Contacts_Updated);
+	RegisterEvent(Contacts, PageUpdated, Contacts_Page_Updated);
 
 	WaitForInitializationComplete();
 	Contacts.Initialize(File_Name);

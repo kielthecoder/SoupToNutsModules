@@ -23,6 +23,7 @@ namespace SoupToNuts.Phonebook
         public delegate void StatusFeedback (ushort success);
         public delegate void SelectionFeedback (ushort value);
         public delegate void PhonebookUpdateEventHandler (object sender, PhonebookUpdateEventArgs args);
+        public delegate void PhonebookPageEventHandler (object sender, PhonebookPageEventArgs args);
 
         private List<PhonebookEntry> _entries;
         private string _filename;
@@ -32,6 +33,7 @@ namespace SoupToNuts.Phonebook
         public SelectionFeedback OnSelection { get; set; }
 
         public event PhonebookUpdateEventHandler PhonebookUpdated;
+        public event PhonebookPageEventHandler PageUpdated;
 
         private const ushort MAX_PAGE_SIZE = 500;
         private ushort _pageSize;
@@ -84,6 +86,25 @@ namespace SoupToNuts.Phonebook
                 {
                     _currentPage = value;
                     Selection = 0;
+
+                    if (PageUpdated != null)
+                    {
+                        var args = new PhonebookPageEventArgs();
+                        args.Page = _currentPage;
+                        args.Names = new string[_pageSize];
+
+                        for (int i = 0; i < _pageSize; i++)
+                        {
+                            int j = (_currentPage - 1) * _pageSize + i;
+
+                            if (j < _entries.Count)
+                                args.Names[i] = _entries[j].Name;
+                            else
+                                args.Names[i] = "";
+                        }
+
+                        PageUpdated(this, args);
+                    }
                 }
             }
         }
