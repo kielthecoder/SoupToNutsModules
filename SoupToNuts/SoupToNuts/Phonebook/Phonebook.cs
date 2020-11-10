@@ -12,11 +12,18 @@ namespace SoupToNuts.Phonebook
         public string Number { get; set; }
     }
 
+    public class PhonebookPageEventArgs : EventArgs
+    {
+        public ushort Page { get; set; }
+        public string[] Names { get; set; }
+    }
+
     public class Phonebook
     {
         public delegate void StatusFeedback (ushort success);
         public delegate void SelectionFeedback (ushort value);
         public delegate void PhonebookUpdateEventHandler (object sender, PhonebookUpdateEventArgs args);
+        public delegate void PhonebookPageEventHandler (object sender, PhonebookPageEventArgs args);
 
         private List<PhonebookEntry> _entries;
         private string _filename;
@@ -26,6 +33,81 @@ namespace SoupToNuts.Phonebook
         public SelectionFeedback OnSelection { get; set; }
 
         public event PhonebookUpdateEventHandler PhonebookUpdated;
+        public event PhonebookPageEventHandler PageUpdated;
+
+        private const ushort MAX_PAGE_SIZE = 500;
+        private ushort _pageSize;
+
+        public ushort PageSize
+        {
+            get
+            {
+                return _pageSize;
+            }
+            set
+            {
+                if ((value > 0) &&
+                    (value <= MAX_PAGE_SIZE))
+                {
+                    _pageSize = value;
+                }
+            }
+        }
+
+        public ushort TotalPages
+        {
+            get
+            {
+                ushort pages;
+
+                pages = (ushort)(_entries.Count / PageSize);
+
+                if (_entries.Count % PageSize > 0)
+                    pages++;
+
+                if (pages == 0) pages = 1;
+
+                return pages;
+            }
+        }
+
+        private ushort _currentPage;
+
+        public ushort CurrentPage
+        {
+            get
+            {
+                return _currentPage;
+            }
+            set
+            {
+                if ((value > 0) &&
+                    (value <= TotalPages))
+                {
+                    _currentPage = value;
+                    Selection = 0;
+
+                    if (PageUpdated != null)
+                    {
+                        var args = new PhonebookPageEventArgs();
+                        args.Page = _currentPage;
+                        args.Names = new string[_pageSize];
+
+                        for (int i = 0; i < _pageSize; i++)
+                        {
+                            int j = (_currentPage - 1) * _pageSize + i;
+
+                            if (j < _entries.Count)
+                                args.Names[i] = _entries[j].Name;
+                            else
+                                args.Names[i] = "";
+                        }
+
+                        PageUpdated(this, args);
+                    }
+                }
+            }
+        }
 
         private int _selection;
 
@@ -40,7 +122,7 @@ namespace SoupToNuts.Phonebook
             }
             set
             {
-                if (value < _entries.Count)
+                if (value <= _entries.Count)
                 {
                     _selection = value - 1;
 
@@ -56,6 +138,25 @@ namespace SoupToNuts.Phonebook
                     }
 
                     if (OnSelection != null) OnSelection((ushort)(_selection + 1));
+                }
+            }
+        }
+
+        public ushort SelectPageEntry
+        {
+            get
+            {
+                if (_selection < 0)
+                    return 0;
+
+                return (ushort)((_selection + 1) % PageSize);
+            }
+            set
+            {
+                if ((value > 0) &&
+                    (value <= PageSize))
+                {
+                    Selection = (ushort)((CurrentPage - 1) * PageSize + value);
                 }
             }
         }
@@ -143,7 +244,7 @@ namespace SoupToNuts.Phonebook
         public void Remove(ushort index)
         {
             if ((index > 0) &&
-                (index < _entries.Count))
+                (index <= _entries.Count))
             {
                 _entries.RemoveAt(index - 1);
 
