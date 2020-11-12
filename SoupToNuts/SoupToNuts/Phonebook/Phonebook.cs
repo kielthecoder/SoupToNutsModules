@@ -149,7 +149,7 @@ namespace SoupToNuts.Phonebook
                 if (_selection < 0)
                     return 0;
 
-                return (ushort)((_selection + 1) % PageSize);
+                return (ushort)((_selection % PageSize) + 1);
             }
             set
             {
