@@ -1,7 +1,9 @@
 bin/
 obj/
 SPlsWork/
+*.c3prj/
 *.ASV
+*.c3prj.hash
 *.csproj.user
 *.lpz
 *.lpz.hash

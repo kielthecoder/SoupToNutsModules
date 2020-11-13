@@ -6,7 +6,7 @@
 
 #DEFAULT_VOLATILE
 #ENABLE_STACK_CHECKING
-#ENABLE_TRACE
+// #ENABLE_TRACE
 
 #DEFINE_CONSTANT MAX_PAGE_SIZE 10
 
@@ -21,6 +21,7 @@ STRING_INPUT  New_Contact_Number[100];
 DIGITAL_INPUT Add_New_Contact;
 
 ANALOG_INPUT  Select;
+ANALOG_INPUT  Select_Page_Entry;
 DIGITAL_INPUT Remove_Selected;
 
 ANALOG_INPUT  Current_Page;
@@ -62,6 +63,11 @@ THREADSAFE PUSH Add_New_Contact
 THREADSAFE CHANGE Select
 {
 	Contacts.Selection = Select;
+}
+
+THREADSAFE CHANGE Select_Page_Entry
+{
+	Contacts.SelectPageEntry = Select_Page_Entry;
 }
 
 THREADSAFE PUSH Remove_Selected
