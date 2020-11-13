@@ -194,6 +194,8 @@ namespace SoupToNuts.Phonebook
                     }
                 }
 
+                _entries.Sort();
+
                 if (OnInitialize != null) OnInitialize(1);
             }
             catch (Exception e)
@@ -231,6 +233,7 @@ namespace SoupToNuts.Phonebook
         public void Add(string name, string number)
         {
             _entries.Add(new PhonebookEntry { Name = name, Number = number });
+            _entries.Sort();
 
             if (PhonebookUpdated != null)
             {
