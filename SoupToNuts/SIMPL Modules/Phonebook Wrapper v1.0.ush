@@ -38,8 +38,10 @@
   InputList2SigType2=Serial
   InputList2Cue3=Select
   InputList2SigType3=Analog
-  InputList2Cue4=Current_Page
+  InputList2Cue4=Select_Page_Entry
   InputList2SigType4=Analog
+  InputList2Cue5=Current_Page
+  InputList2SigType5=Analog
   OutputList2Cue1=Select_Fb
   OutputList2SigType1=Analog
   OutputList2Cue2=Selected_Entry_Name
@@ -57,8 +59,8 @@
   ParamSigType2=String
   MinVariableInputs=3
   MaxVariableInputs=3
-  MinVariableInputsList2=4
-  MaxVariableInputsList2=4
+  MinVariableInputsList2=5
+  MaxVariableInputsList2=5
   MinVariableOutputs=2
   MaxVariableOutputs=2
   MinVariableOutputsList2=6
