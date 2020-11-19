@@ -109,6 +109,7 @@ EVENTHANDLER Contacts_Updated (Phonebook sender, PhonebookUpdateEventArgs args)
 	Trace("Contact %d updated: %s [ %s ]", args.Index, args.Name, args.Number);
 
 	Total_Pages_Fb = Contacts.TotalPages;
+	Contacts.CurrentPage = 1;
 }
 
 EVENTHANDLER Contacts_Page_Updated (Phonebook sender, PhonebookPageEventArgs args)
