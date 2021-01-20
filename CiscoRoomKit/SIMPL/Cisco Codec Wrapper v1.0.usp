@@ -1,0 +1,63 @@
+// --- Compiler Directives --------------------------------------------------
+
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+#ENABLE_TRACE
+
+#DEFINE_CONSTANT MAX_NAME_LEN 50
+
+#USER_SIMPLSHARP_LIBRARY "CiscoRoomKit"
+
+// --- Inputs ---------------------------------------------------------------
+
+DIGITAL_INPUT Connect;
+
+// --- Outputs --------------------------------------------------------------
+
+DIGITAL_OUTPUT Connect_Fb;
+
+// --- Parameters -----------------------------------------------------------
+
+STRING_PARAMETER Host[MAX_NAME_LEN];
+STRING_PARAMETER User[MAX_NAME_LEN];
+STRING_PARAMETER Password[MAX_NAME_LEN];
+
+// --- Global Variables -----------------------------------------------------
+
+Device Codec;
+
+// --- Events ---------------------------------------------------------------
+
+PUSH Connect
+{
+	Codec.Connect();
+}
+
+RELEASE Connect
+{
+	Codec.Disconnect();
+}
+
+EVENTHANDLER Codec_OnConnect (Device sender, EventArgs args)
+{
+	Connect_Fb = 1;
+}
+
+EVENTHANDLER Codec_OnDisconnect (Device sender, EventArgs args)
+{
+	Connect_Fb = 0;
+}
+
+// --- Main -----------------------------------------------------------------
+
+Function Main()
+{
+	Codec.Host = Host;
+	Codec.User = User;
+	Codec.Password = Password;
+
+	RegisterEvent(Codec, OnConnect, Codec_OnConnect);
+	RegisterEvent(Codec, OnDisconnect, Codec_OnDisconnect);
+
+	WaitForInitializationComplete();
+}
