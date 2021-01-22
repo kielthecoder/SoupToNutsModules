@@ -5,16 +5,19 @@
 #ENABLE_TRACE
 
 #DEFINE_CONSTANT MAX_NAME_LEN 50
+#DEFINE_CONSTANT MAX_TEXT_LEN 255
 
 #USER_SIMPLSHARP_LIBRARY "CiscoRoomKit"
 
 // --- Inputs ---------------------------------------------------------------
 
 DIGITAL_INPUT Connect;
+STRING_INPUT  To_Device[MAX_TEXT_LEN];
 
 // --- Outputs --------------------------------------------------------------
 
 DIGITAL_OUTPUT Connect_Fb;
+STRING_OUTPUT  From_Device;
 
 // --- Parameters -----------------------------------------------------------
 
@@ -38,6 +41,11 @@ RELEASE Connect
 	Codec.Disconnect();
 }
 
+CHANGE To_Device
+{
+	Codec.SendCommand(To_Device);
+}
+
 EVENTHANDLER Codec_OnConnect (Device sender, EventArgs args)
 {
 	Connect_Fb = 1;
@@ -46,6 +54,11 @@ EVENTHANDLER Codec_OnConnect (Device sender, EventArgs args)
 EVENTHANDLER Codec_OnDisconnect (Device sender, EventArgs args)
 {
 	Connect_Fb = 0;
+}
+
+EVENTHANDLER Codec_OnDataRx (Device sender, DataEventArgs args)
+{
+	From_Device = args.Message;
 }
 
 // --- Main -----------------------------------------------------------------
@@ -58,6 +71,7 @@ Function Main()
 
 	RegisterEvent(Codec, OnConnect, Codec_OnConnect);
 	RegisterEvent(Codec, OnDisconnect, Codec_OnDisconnect);
+	RegisterEvent(Codec, OnDataReceived, Codec_OnDataRx);
 
 	WaitForInitializationComplete();
 }

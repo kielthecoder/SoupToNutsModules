@@ -5,9 +5,15 @@ using Crestron.SimplSharp.Ssh.Common;
 
 namespace CiscoRoomKit
 {
+    public class DataEventArgs : EventArgs
+    {
+        public string Message { get; set; }
+    }
+
     public class Device
     {
         private SshClient _ssh;
+        private ShellStream _stream;
 
         public string Host { get; set; }
         public string User { get; set; }
@@ -15,6 +21,7 @@ namespace CiscoRoomKit
 
         public event EventHandler OnConnect;
         public event EventHandler OnDisconnect;
+        public event EventHandler<DataEventArgs> OnDataReceived;
 
         public Device()
         {
@@ -33,6 +40,11 @@ namespace CiscoRoomKit
             _ssh = new SshClient(conn);
             _ssh.ErrorOccurred += HandleError;
             _ssh.Connect();
+
+            // Create stream
+            _stream = _ssh.CreateShellStream("Terminal", 80, 24, 800, 600, 1024);
+            _stream.DataReceived += HandleDataReceived;
+            _stream.ErrorOccurred += HandleStreamError;
 
             if (OnConnect != null)
             {
@@ -53,6 +65,15 @@ namespace CiscoRoomKit
                 {
                     OnDisconnect(this, new EventArgs());
                 }
+            }
+        }
+
+        public void SendCommand(string cmd)
+        {
+            // Make sure we can actually send data
+            if (_ssh.IsConnected && _stream.CanWrite)
+            {
+                _stream.WriteLine(cmd);
             }
         }
 
@@ -79,6 +100,33 @@ namespace CiscoRoomKit
                     OnDisconnect(this, new EventArgs());
                 }
             }
+        }
+
+        private void HandleDataReceived(object sender,
+            ShellDataEventArgs args)
+        {
+            var stream = (ShellStream)sender;
+            string data = "";
+
+            // Gather all the available data
+            while (stream.DataAvailable)
+            {
+                data += stream.Read();
+            }
+
+            if (data != "")
+            {
+                if (OnDataReceived != null)
+                {
+                    OnDataReceived(this, new DataEventArgs() { Message = data });
+                }
+            }
+        }
+
+        private void HandleStreamError(object sender,
+            EventArgs args)
+        {
+            Disconnect();
         }
     }
 }
