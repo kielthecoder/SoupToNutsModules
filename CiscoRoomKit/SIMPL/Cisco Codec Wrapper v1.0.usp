@@ -1,0 +1,98 @@
+// --- Compiler Directives --------------------------------------------------
+
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+#ENABLE_TRACE
+
+#DEFINE_CONSTANT MAX_NAME_LEN 50
+#DEFINE_CONSTANT MAX_TEXT_LEN 255
+
+#USER_SIMPLSHARP_LIBRARY "CiscoRoomKit"
+
+// --- Inputs ---------------------------------------------------------------
+
+DIGITAL_INPUT Connect;
+STRING_INPUT  To_Device[MAX_TEXT_LEN];
+
+// --- Outputs --------------------------------------------------------------
+
+DIGITAL_OUTPUT Connect_Fb;
+DIGITAL_OUTPUT Error_Fb;
+STRING_OUTPUT  Error_Message;
+STRING_OUTPUT  From_Device;
+
+// --- Parameters -----------------------------------------------------------
+
+STRING_PARAMETER Host[MAX_NAME_LEN];
+STRING_PARAMETER User[MAX_NAME_LEN];
+STRING_PARAMETER Password[MAX_NAME_LEN];
+
+// --- Global Variables -----------------------------------------------------
+
+Device Codec;
+
+// --- Events ---------------------------------------------------------------
+
+PUSH Connect
+{
+	Try
+	{
+		Codec.Connect();
+
+		Error_Fb = 0;
+		Error_Message = "";
+	}
+	Catch
+	{
+		Error_Fb = 1;
+		Error_Message = GetExceptionMessage();
+	}
+}
+
+RELEASE Connect
+{
+	Codec.Disconnect();
+}
+
+CHANGE To_Device
+{
+	Try
+	{
+		Codec.SendCommand(To_Device);
+	}
+	Catch
+	{
+		Error_Fb = 1;
+		Error_Message = GetExceptionMessage();
+	}
+}
+
+EVENTHANDLER Codec_OnConnect (Device sender, EventArgs args)
+{
+	Connect_Fb = 1;
+}
+
+EVENTHANDLER Codec_OnDisconnect (Device sender, EventArgs args)
+{
+	Connect_Fb = 0;
+}
+
+EVENTHANDLER Codec_OnDataRx (Device sender, DataEventArgs args)
+{
+	From_Device = args.Message;
+}
+
+// --- Main -----------------------------------------------------------------
+
+Function Main()
+{
+	Codec.Host = Host;
+	Codec.User = User;
+	Codec.Password = Password;
+
+	RegisterEvent(Codec, OnConnect, Codec_OnConnect);
+	RegisterEvent(Codec, OnDisconnect, Codec_OnDisconnect);
+	RegisterEvent(Codec, OnDataReceived, Codec_OnDataRx);
+
+	WaitForInitializationComplete();
+}
