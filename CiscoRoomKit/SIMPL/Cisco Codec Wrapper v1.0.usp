@@ -17,6 +17,8 @@ STRING_INPUT  To_Device[MAX_TEXT_LEN];
 // --- Outputs --------------------------------------------------------------
 
 DIGITAL_OUTPUT Connect_Fb;
+DIGITAL_OUTPUT Error_Fb;
+STRING_OUTPUT  Error_Message;
 STRING_OUTPUT  From_Device;
 
 // --- Parameters -----------------------------------------------------------
@@ -33,7 +35,18 @@ Device Codec;
 
 PUSH Connect
 {
-	Codec.Connect();
+	Try
+	{
+		Codec.Connect();
+
+		Error_Fb = 0;
+		Error_Message = "";
+	}
+	Catch
+	{
+		Error_Fb = 1;
+		Error_Message = GetExceptionMessage();
+	}
 }
 
 RELEASE Connect
@@ -43,7 +56,15 @@ RELEASE Connect
 
 CHANGE To_Device
 {
-	Codec.SendCommand(To_Device);
+	Try
+	{
+		Codec.SendCommand(To_Device);
+	}
+	Catch
+	{
+		Error_Fb = 1;
+		Error_Message = GetExceptionMessage();
+	}
 }
 
 EVENTHANDLER Codec_OnConnect (Device sender, EventArgs args)

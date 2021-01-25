@@ -56,6 +56,13 @@ namespace CiscoRoomKit
         {
             if (_ssh != null)
             {
+                if (_stream != null)
+                {
+                    // Close and dispose the I/O stream
+                    _stream.Close();
+                    _stream.Dispose();
+                }
+
                 // Disconnect and dispose of SSH session
                 _ssh.Disconnect();
                 _ssh.Dispose();
