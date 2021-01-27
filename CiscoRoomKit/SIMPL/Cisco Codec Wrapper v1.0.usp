@@ -67,17 +67,17 @@ CHANGE To_Device
 	}
 }
 
-EVENTHANDLER Codec_OnConnect (Device sender, EventArgs args)
+EVENTHANDLER Codec_OnConnect (Codec sender, EventArgs args)
 {
 	Connect_Fb = 1;
 }
 
-EVENTHANDLER Codec_OnDisconnect (Device sender, EventArgs args)
+EVENTHANDLER Codec_OnDisconnect (Codec sender, EventArgs args)
 {
 	Connect_Fb = 0;
 }
 
-EVENTHANDLER Codec_OnResponse (Device sender, DataEventArgs args)
+EVENTHANDLER Codec_OnResponse (Codec sender, DataEventArgs args)
 {
 	From_Device = args.Message;
 }
