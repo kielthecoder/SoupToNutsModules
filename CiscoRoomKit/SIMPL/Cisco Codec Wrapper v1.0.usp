@@ -29,7 +29,7 @@ STRING_PARAMETER Password[MAX_NAME_LEN];
 
 // --- Global Variables -----------------------------------------------------
 
-Device Codec;
+Codec RoomKit;
 
 // --- Events ---------------------------------------------------------------
 
@@ -37,7 +37,7 @@ PUSH Connect
 {
 	Try
 	{
-		Codec.Connect();
+		RoomKit.Connect();
 
 		Error_Fb = 0;
 		Error_Message = "";
@@ -51,14 +51,14 @@ PUSH Connect
 
 RELEASE Connect
 {
-	Codec.Disconnect();
+	RoomKit.Disconnect();
 }
 
 CHANGE To_Device
 {
 	Try
 	{
-		Codec.SendCommand(To_Device);
+		RoomKit.SendCommand(To_Device);
 	}
 	Catch
 	{
@@ -77,7 +77,7 @@ EVENTHANDLER Codec_OnDisconnect (Device sender, EventArgs args)
 	Connect_Fb = 0;
 }
 
-EVENTHANDLER Codec_OnDataRx (Device sender, DataEventArgs args)
+EVENTHANDLER Codec_OnResponse (Device sender, DataEventArgs args)
 {
 	From_Device = args.Message;
 }
@@ -86,13 +86,13 @@ EVENTHANDLER Codec_OnDataRx (Device sender, DataEventArgs args)
 
 Function Main()
 {
-	Codec.Host = Host;
-	Codec.User = User;
-	Codec.Password = Password;
+	RoomKit.Host = Host;
+	RoomKit.User = User;
+	RoomKit.Password = Password;
 
-	RegisterEvent(Codec, OnConnect, Codec_OnConnect);
-	RegisterEvent(Codec, OnDisconnect, Codec_OnDisconnect);
-	RegisterEvent(Codec, OnDataReceived, Codec_OnDataRx);
+	RegisterEvent(RoomKit, OnConnect, Codec_OnConnect);
+	RegisterEvent(RoomKit, OnDisconnect, Codec_OnDisconnect);
+	RegisterEvent(RoomKit, OnResponse, Codec_OnResponse);
 
 	WaitForInitializationComplete();
 }
