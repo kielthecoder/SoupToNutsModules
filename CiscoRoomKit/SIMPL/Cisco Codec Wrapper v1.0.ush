@@ -24,6 +24,8 @@
   SMWRev=3.00.00
   InputCue1=Connect
   InputSigType1=Digital
+  InputCue2=Debug
+  InputSigType2=Digital
   OutputCue1=Connect_Fb
   OutputSigType1=Digital
   OutputCue2=Error_Fb
@@ -41,8 +43,8 @@
   ParamSigType3=String
   ParamCue4=Password
   ParamSigType4=String
-  MinVariableInputs=1
-  MaxVariableInputs=1
+  MinVariableInputs=2
+  MaxVariableInputs=2
   MinVariableInputsList2=1
   MaxVariableInputsList2=1
   MinVariableOutputs=2
