@@ -12,6 +12,7 @@
 // --- Inputs ---------------------------------------------------------------
 
 DIGITAL_INPUT Connect;
+DIGITAL_INPUT Debug;
 STRING_INPUT  To_Device[MAX_TEXT_LEN];
 
 // --- Outputs --------------------------------------------------------------
@@ -79,7 +80,10 @@ EVENTHANDLER Codec_OnDisconnect (Codec sender, EventArgs args)
 
 EVENTHANDLER Codec_OnResponse (Codec sender, DataEventArgs args)
 {
-	From_Device = args.Message;
+	If (Debug)
+	{
+		From_Device = args.Message;
+	}
 }
 
 // --- Main -----------------------------------------------------------------
