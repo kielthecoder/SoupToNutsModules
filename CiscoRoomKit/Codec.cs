@@ -6,8 +6,11 @@ namespace CiscoRoomKit
     public class Codec : Device
     {
         public event EventHandler<DataEventArgs> OnResponse;
+        public event EventHandler<DataEventArgs> OnCallStatus;
 
         public string VideoNumber { get; set; }
+        public string CallStatus { get; private set; }
+        public ushort CallConnected { get; private set; }
 
         public Codec()
         {
@@ -22,6 +25,8 @@ namespace CiscoRoomKit
             SendCommand("echo off");
             SendCommand("xfeedback deregisterall");
             SendCommand("xpreferences outputmode terminal");
+
+            SendCommand("xfeedback register /Status/Call");
         }
 
         private void HandleDataReceived(object sender, DataEventArgs args)
@@ -42,7 +47,40 @@ namespace CiscoRoomKit
 
         private void HandleResponse(object sender, DataEventArgs args)
         {
+            if (args.Message.StartsWith("*s Call "))
+            {
+                var status = args.Message.Remove(0, 8);
+                CrestronConsole.PrintLine("Calling HandleCallStatus(\"{0}\")", status);
+                HandleCallStatus(status);
+            }
+        }
 
+        private void HandleCallStatus(string msg)
+        {
+            if (msg.Contains("Status"))
+            {
+                CallStatus = msg.Remove(0, msg.LastIndexOf(':') + 1).Trim();
+
+                if (CallStatus == "Connected")
+                    CallConnected = 1;
+                else
+                    CallConnected = 0;
+
+                if (OnCallStatus != null)
+                {
+                    OnCallStatus(this, new DataEventArgs { Message = CallStatus });
+                }
+            }
+            else if (msg.Contains("(ghost=True)"))
+            {
+                CallStatus = "";
+                CallConnected = 0;
+
+                if (OnCallStatus != null)
+                {
+                    OnCallStatus(this, new DataEventArgs { Message = CallStatus });
+                }
+            }
         }
 
         public void Dial()
