@@ -7,7 +7,7 @@ namespace CiscoRoomKit
     {
         public event EventHandler<DataEventArgs> OnResponse;
 
-        public string Standby { get; private set; }
+        public string VideoNumber { get; set; }
 
         public Codec()
         {
@@ -43,6 +43,21 @@ namespace CiscoRoomKit
         private void HandleResponse(object sender, DataEventArgs args)
         {
 
+        }
+
+        public void Dial()
+        {
+            if (VideoNumber.Length > 0)
+            {
+                var cmd = String.Format("xcommand Dial Number: \"{0}\" CallType: Auto", VideoNumber);
+                
+                SendCommand(cmd);
+            }
+        }
+
+        public void HangUp()
+        {
+            SendCommand("xcommand Call Disconnect");
         }
     }
 }
