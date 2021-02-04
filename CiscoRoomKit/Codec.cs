@@ -25,7 +25,6 @@ namespace CiscoRoomKit
             SendCommand("echo off");
             SendCommand("xfeedback deregisterall");
             SendCommand("xpreferences outputmode terminal");
-
             SendCommand("xfeedback register /Status/Call");
         }
 
@@ -50,7 +49,6 @@ namespace CiscoRoomKit
             if (args.Message.StartsWith("*s Call "))
             {
                 var status = args.Message.Remove(0, 8);
-                CrestronConsole.PrintLine("Calling HandleCallStatus(\"{0}\")", status);
                 HandleCallStatus(status);
             }
         }
@@ -87,7 +85,7 @@ namespace CiscoRoomKit
         {
             if (VideoNumber.Length > 0)
             {
-                var cmd = String.Format("xcommand Dial Number: \"{0}\" CallType: Auto", VideoNumber);
+                var cmd = String.Format("xcommand Dial Number: {0}", VideoNumber);
                 
                 SendCommand(cmd);
             }

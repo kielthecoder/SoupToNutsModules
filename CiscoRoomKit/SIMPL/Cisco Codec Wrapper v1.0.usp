@@ -1,4 +1,4 @@
-// --- Compiler Directives --------------------------------------------------
+// --- Compiler Directives ---
 
 #DEFAULT_VOLATILE
 #ENABLE_STACK_CHECKING
@@ -10,7 +10,7 @@
 
 #USER_SIMPLSHARP_LIBRARY "CiscoRoomKit"
 
-// --- Inputs ---------------------------------------------------------------
+// --- Inputs ---
 
 DIGITAL_INPUT Connect;
 DIGITAL_INPUT Debug;
@@ -19,7 +19,7 @@ DIGITAL_INPUT Hang_Up;
 STRING_INPUT  Video_Number[MAX_DIAL_LEN];
 STRING_INPUT  To_Device[MAX_TEXT_LEN];
 
-// --- Outputs --------------------------------------------------------------
+// --- Outputs ---
 
 DIGITAL_OUTPUT Connect_Fb;
 DIGITAL_OUTPUT Error_Fb;
@@ -27,17 +27,17 @@ STRING_OUTPUT  Error_Message;
 STRING_OUTPUT  Call_Status;
 STRING_OUTPUT  From_Device;
 
-// --- Parameters -----------------------------------------------------------
+// --- Parameters ---
 
 STRING_PARAMETER Host[MAX_NAME_LEN];
 STRING_PARAMETER User[MAX_NAME_LEN];
 STRING_PARAMETER Password[MAX_NAME_LEN];
 
-// --- Global Variables -----------------------------------------------------
+// --- Global Variables ---
 
 Codec RoomKit;
 
-// --- Events ---------------------------------------------------------------
+// --- Events ---
 
 PUSH Connect
 {
@@ -111,7 +111,7 @@ EVENTHANDLER Codec_OnCallStatus (Codec sender, DataEventArgs args)
 	Call_Status = args.Message;
 }
 
-// --- Main -----------------------------------------------------------------
+// --- Main ---
 
 Function Main()
 {
