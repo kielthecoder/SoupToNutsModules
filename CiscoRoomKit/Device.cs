@@ -18,6 +18,7 @@ namespace CiscoRoomKit
         public string Host { get; set; }
         public string User { get; set; }
         public string Password { get; set; }
+        public string ErrorMessage { get; private set; }
 
         public event EventHandler OnConnect;
         public event EventHandler OnDisconnect;
@@ -29,26 +30,37 @@ namespace CiscoRoomKit
 
         public void Connect()
         {
-            // Handle interactive authentication (typing in password)
-            var auth = new KeyboardInteractiveAuthenticationMethod(User);
-            auth.AuthenticationPrompt += HandleAuthentication;
-
-            // Create connection info
-            var conn = new ConnectionInfo(Host, User, auth);
-
-            // Connect SSH session
-            _ssh = new SshClient(conn);
-            _ssh.ErrorOccurred += HandleError;
-            _ssh.Connect();
-
-            // Create stream
-            _stream = _ssh.CreateShellStream("Terminal", 80, 24, 800, 600, 1024);
-            _stream.DataReceived += HandleDataReceived;
-            _stream.ErrorOccurred += HandleStreamError;
-
-            if (OnConnect != null)
+            try
             {
-                OnConnect(this, new EventArgs());
+                // Handle interactive authentication (typing in password)
+                var auth = new KeyboardInteractiveAuthenticationMethod(User);
+                auth.AuthenticationPrompt += HandleAuthentication;
+
+                // Create connection info
+                var conn = new ConnectionInfo(Host, User, auth);
+
+                // Connect SSH session
+                _ssh = new SshClient(conn);
+                _ssh.ErrorOccurred += HandleError;
+                _ssh.Connect();
+
+                // Create stream
+                _stream = _ssh.CreateShellStream("Terminal", 80, 24, 800, 600, 1024);
+                _stream.DataReceived += HandleDataReceived;
+                _stream.ErrorOccurred += HandleStreamError;
+
+                if (OnConnect != null)
+                {
+                    OnConnect(this, new EventArgs());
+                }
+
+                ErrorMessage = "";
+            }
+            catch (SshConnectionException e)
+            {
+                ErrorMessage = e.Message;
+
+                Disconnect();
             }
         }
 
