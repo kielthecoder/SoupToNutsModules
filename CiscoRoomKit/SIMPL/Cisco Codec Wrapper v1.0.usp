@@ -1,38 +1,43 @@
-// --- Compiler Directives --------------------------------------------------
+// --- Compiler Directives ---
 
 #DEFAULT_VOLATILE
 #ENABLE_STACK_CHECKING
 #ENABLE_TRACE
 
 #DEFINE_CONSTANT MAX_NAME_LEN 50
+#DEFINE_CONSTANT MAX_DIAL_LEN 100
 #DEFINE_CONSTANT MAX_TEXT_LEN 255
 
 #USER_SIMPLSHARP_LIBRARY "CiscoRoomKit"
 
-// --- Inputs ---------------------------------------------------------------
+// --- Inputs ---
 
 DIGITAL_INPUT Connect;
 DIGITAL_INPUT Debug;
+DIGITAL_INPUT Dial;
+DIGITAL_INPUT Hang_Up;
+STRING_INPUT  Video_Number[MAX_DIAL_LEN];
 STRING_INPUT  To_Device[MAX_TEXT_LEN];
 
-// --- Outputs --------------------------------------------------------------
+// --- Outputs ---
 
 DIGITAL_OUTPUT Connect_Fb;
 DIGITAL_OUTPUT Error_Fb;
 STRING_OUTPUT  Error_Message;
+STRING_OUTPUT  Call_Status;
 STRING_OUTPUT  From_Device;
 
-// --- Parameters -----------------------------------------------------------
+// --- Parameters ---
 
 STRING_PARAMETER Host[MAX_NAME_LEN];
 STRING_PARAMETER User[MAX_NAME_LEN];
 STRING_PARAMETER Password[MAX_NAME_LEN];
 
-// --- Global Variables -----------------------------------------------------
+// --- Global Variables ---
 
 Codec RoomKit;
 
-// --- Events ---------------------------------------------------------------
+// --- Events ---
 
 PUSH Connect
 {
@@ -53,6 +58,21 @@ PUSH Connect
 RELEASE Connect
 {
 	RoomKit.Disconnect();
+}
+
+PUSH Dial
+{
+	RoomKit.Dial();
+}
+
+PUSH Hang_Up
+{
+	RoomKit.HangUp();
+}
+
+CHANGE Video_Number
+{
+	RoomKit.VideoNumber = Video_Number;
 }
 
 CHANGE To_Device
@@ -86,7 +106,18 @@ EVENTHANDLER Codec_OnResponse (Codec sender, DataEventArgs args)
 	}
 }
 
-// --- Main -----------------------------------------------------------------
+EVENTHANDLER Codec_OnCallStatus (Codec sender, DataEventArgs args)
+{
+	Call_Status = args.Message;
+}
+
+EVENTHANDLER Codec_OnError (Codec sender, DataEventArgs args)
+{
+	Error_Fb = 1;
+	Error_Message = args.Message;
+}
+
+// --- Main ---
 
 Function Main()
 {
@@ -97,6 +128,8 @@ Function Main()
 	RegisterEvent(RoomKit, OnConnect, Codec_OnConnect);
 	RegisterEvent(RoomKit, OnDisconnect, Codec_OnDisconnect);
 	RegisterEvent(RoomKit, OnResponse, Codec_OnResponse);
+	RegisterEvent(RoomKit, OnCallStatus, Codec_OnCallStatus);
+	RegisterEvent(RoomKit, OnError, Codec_OnError);
 
 	WaitForInitializationComplete();
 }
