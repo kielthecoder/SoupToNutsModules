@@ -111,6 +111,12 @@ EVENTHANDLER Codec_OnCallStatus (Codec sender, DataEventArgs args)
 	Call_Status = args.Message;
 }
 
+EVENTHANDLER Codec_OnError (Codec sender, DataEventArgs args)
+{
+	Error_Fb = 1;
+	Error_Message = args.Message;
+}
+
 // --- Main ---
 
 Function Main()
@@ -123,6 +129,7 @@ Function Main()
 	RegisterEvent(RoomKit, OnDisconnect, Codec_OnDisconnect);
 	RegisterEvent(RoomKit, OnResponse, Codec_OnResponse);
 	RegisterEvent(RoomKit, OnCallStatus, Codec_OnCallStatus);
+	RegisterEvent(RoomKit, OnError, Codec_OnError);
 
 	WaitForInitializationComplete();
 }

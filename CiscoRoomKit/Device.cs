@@ -18,11 +18,11 @@ namespace CiscoRoomKit
         public string Host { get; set; }
         public string User { get; set; }
         public string Password { get; set; }
-        public string ErrorMessage { get; private set; }
 
         public event EventHandler OnConnect;
         public event EventHandler OnDisconnect;
         public event EventHandler<DataEventArgs> OnDataReceived;
+        public event EventHandler<DataEventArgs> OnError;
 
         public Device()
         {
@@ -45,7 +45,8 @@ namespace CiscoRoomKit
                 _ssh.Connect();
 
                 // Create stream
-                _stream = _ssh.CreateShellStream("Terminal", 80, 24, 800, 600, 1024);
+                _stream = _ssh.CreateShellStream("Terminal", 80, 24,
+                    800, 600, 1024);
                 _stream.DataReceived += HandleDataReceived;
                 _stream.ErrorOccurred += HandleStreamError;
 
@@ -53,12 +54,13 @@ namespace CiscoRoomKit
                 {
                     OnConnect(this, new EventArgs());
                 }
-
-                ErrorMessage = "";
             }
             catch (SshConnectionException e)
             {
-                ErrorMessage = e.Message;
+                if (OnError != null)
+                {
+                    OnError(this, new DataEventArgs() { Message = e.Message });
+                }
 
                 Disconnect();
             }
